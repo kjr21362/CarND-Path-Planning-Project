@@ -55,33 +55,18 @@ int ClosestWaypoint(double x, double y, const vector<double> &maps_x, const vect
 			closestLen = dist;
 			closestWaypoint = i;
 		}
-<<<<<<< HEAD
-	}
-	return closestWaypoint;
-=======
-
 	}
 
 	return closestWaypoint;
-
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 }
 
 int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x, const vector<double> &maps_y)
 {
   int closestWaypoint = ClosestWaypoint(x,y,maps_x,maps_y);
-<<<<<<< HEAD
   double map_x = maps_x[closestWaypoint];
   double map_y = maps_y[closestWaypoint];
   double heading = atan2((map_y-y),(map_x-x));
-=======
 
-  double map_x = maps_x[closestWaypoint];
-  double map_y = maps_y[closestWaypoint];
-
-  double heading = atan2((map_y-y),(map_x-x));
-
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
   double angle = fabs(theta-heading);
   angle = min(2*pi() - angle, angle);
 
@@ -93,10 +78,6 @@ int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
       closestWaypoint = 0;
     }
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
   return closestWaypoint;
 }
 
@@ -104,10 +85,7 @@ int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
 vector<double> getFrenet(double x, double y, double theta, const vector<double> &maps_x, const vector<double> &maps_y)
 {
 	int next_wp = NextWaypoint(x,y, theta, maps_x,maps_y);
-<<<<<<< HEAD
-=======
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 	int prev_wp;
 	prev_wp = next_wp-1;
 	if(next_wp == 0)
@@ -119,25 +97,16 @@ vector<double> getFrenet(double x, double y, double theta, const vector<double> 
 	double n_y = maps_y[next_wp]-maps_y[prev_wp];
 	double x_x = x - maps_x[prev_wp];
 	double x_y = y - maps_y[prev_wp];
-<<<<<<< HEAD
-=======
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 	// find the projection of x onto n
 	double proj_norm = (x_x*n_x+x_y*n_y)/(n_x*n_x+n_y*n_y);
 	double proj_x = proj_norm*n_x;
 	double proj_y = proj_norm*n_y;
-<<<<<<< HEAD
-	double frenet_d = distance(x_x,x_y,proj_x,proj_y);
-
-	//see if d value is positive or negative by comparing it to a center point
-=======
 
 	double frenet_d = distance(x_x,x_y,proj_x,proj_y);
 
 	//see if d value is positive or negative by comparing it to a center point
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 	double center_x = 1000-maps_x[prev_wp];
 	double center_y = 2000-maps_y[prev_wp];
 	double centerToPos = distance(center_x,center_y,x_x,x_y);
@@ -147,27 +116,17 @@ vector<double> getFrenet(double x, double y, double theta, const vector<double> 
 	{
 		frenet_d *= -1;
 	}
-<<<<<<< HEAD
-=======
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 	// calculate s value
 	double frenet_s = 0;
 	for(int i = 0; i < prev_wp; i++)
 	{
 		frenet_s += distance(maps_x[i],maps_y[i],maps_x[i+1],maps_y[i+1]);
 	}
-<<<<<<< HEAD
-	frenet_s += distance(0,0,proj_x,proj_y);
-
-	return {frenet_s,frenet_d};
-=======
 
 	frenet_s += distance(0,0,proj_x,proj_y);
 
 	return {frenet_s,frenet_d};
-
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 }
 
 // Transform from Frenet s,d coordinates to Cartesian x,y
@@ -179,15 +138,6 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s, const vec
 	{
 		prev_wp++;
 	}
-<<<<<<< HEAD
-	int wp2 = (prev_wp+1)%maps_x.size();
-	double heading = atan2((maps_y[wp2]-maps_y[prev_wp]),(maps_x[wp2]-maps_x[prev_wp]));
-	// the x,y,s along the segment
-	double seg_s = (s-maps_s[prev_wp]);
-	double seg_x = maps_x[prev_wp]+seg_s*cos(heading);
-	double seg_y = maps_y[prev_wp]+seg_s*sin(heading);
-	double perp_heading = heading-pi()/2;
-=======
 
 	int wp2 = (prev_wp+1)%maps_x.size();
 
@@ -200,15 +150,115 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s, const vec
 
 	double perp_heading = heading-pi()/2;
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 	double x = seg_x + d*cos(perp_heading);
 	double y = seg_y + d*sin(perp_heading);
 
 	return {x,y};
-<<<<<<< HEAD
-=======
+}
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
+bool get_vehicle_ahead(double car_s, int lane, vector<vector<double> > sensor_fusion, vector<double> & vehicle){
+  if(lane < 0 || lane > 2){
+    return false;
+  }
+  double min_s = 6945.554;
+  bool found_vehicle = false;
+  //vector<double> vehicle;
+  
+  for(int i=0; i<sensor_fusion.size(); i++){
+    double check_car_d = sensor_fusion[i][6];
+    double check_car_s = sensor_fusion[i][5];
+    if((check_car_d > 2+4*lane-2) && (check_car_d < 2+4*lane+2)){
+      if(check_car_s > car_s && check_car_s < min_s){
+        min_s = check_car_s;
+        vehicle = sensor_fusion[i];
+        found_vehicle = true;
+      }
+    }
+  }
+  return found_vehicle;
+}
+
+bool get_vehicle_behind(double car_s, int lane, vector<vector<double> > sensor_fusion, vector<double> & vehicle){
+  if(lane < 0 || lane > 2){
+    return false;
+  }
+  double max_s = -1;
+  bool found_vehicle = false;
+  
+  for(int i=0; i<sensor_fusion.size(); i++){
+    double check_car_d = sensor_fusion[i][6];
+    double check_car_s = sensor_fusion[i][5];
+    if((check_car_d > 2+4*lane-2) && (check_car_d < 2+4*lane+2)){
+      if(check_car_s < car_s && check_car_s > max_s){
+        max_s = check_car_s;
+        vehicle = sensor_fusion[i];
+        found_vehicle = true;
+      }
+    }
+  }
+  return found_vehicle;
+}
+
+bool make_lane_change(bool b_vehicle_ahead, bool b_vehicle_behind, vector<double> vehicle_ahead, vector<double> vehicle_behind, string direction, int &lane, double car_s, int prev_size){
+  bool successful = false;
+  if(b_vehicle_ahead == false && b_vehicle_behind == false){
+    if(direction.compare("LEFT") == 0 && lane > 0){
+      lane -= 1;
+      successful = true;
+    }
+    else if(direction.compare("RIGHT") == 0 && lane < 2){
+      lane += 1;
+      successful = true;
+    }
+  }
+  else if(b_vehicle_ahead == true && b_vehicle_behind == true){
+    double ahead_car_s = vehicle_ahead[5];
+    double ahead_car_speed = sqrt(vehicle_ahead[3]*vehicle_ahead[3] + vehicle_ahead[4]*vehicle_ahead[4]);
+    ahead_car_s += (double)prev_size*0.02*ahead_car_speed;
+    double behind_car_s = vehicle_behind[5];
+    double behind_car_speed = sqrt(vehicle_behind[3]*vehicle_behind[3] + vehicle_behind[4]*vehicle_behind[4]);
+    behind_car_s += (double)prev_size*0.02*behind_car_speed;
+
+    if(ahead_car_s > car_s && (ahead_car_s - car_s > 30 && behind_car_s < car_s && (car_s - behind_car_s > 15))){
+      if(direction.compare("LEFT") == 0 && lane > 0){
+        lane -= 1;
+        successful = true;
+      }
+      else if(direction.compare("RIGHT") == 0 && lane < 2){
+        lane += 1;
+        successful = true;
+      }
+  	}
+  }else if(b_vehicle_ahead == true){
+    double ahead_car_s = vehicle_ahead[5];
+    double ahead_car_speed = sqrt(vehicle_ahead[3]*vehicle_ahead[3] + vehicle_ahead[4]*vehicle_ahead[4]);
+    ahead_car_s += (double)prev_size*0.02*ahead_car_speed;
+    if(ahead_car_s > car_s && (ahead_car_s - car_s > 30)){
+      if(direction.compare("LEFT") == 0 && lane > 0){
+        lane -= 1;
+        successful = true;
+      }
+      else if(direction.compare("RIGHT") == 0 && lane < 2){
+        lane += 1;
+        successful = true;
+      }
+  	}
+  }else if(b_vehicle_behind == true){
+    double behind_car_s = vehicle_behind[5];
+    double behind_car_speed = sqrt(vehicle_behind[3]*vehicle_behind[3] + vehicle_behind[4]*vehicle_behind[4]);
+    behind_car_s += (double)prev_size*0.02*behind_car_speed;
+    if(behind_car_s < car_s && (car_s - behind_car_s > 15)){
+      if(direction.compare("LEFT") == 0 && lane > 0){
+        lane -= 1;
+        successful = true;
+      }
+      else if(direction.compare("RIGHT") == 0 && lane < 2){
+        lane += 1;
+        successful = true;
+      }
+  	}
+  }
+  return successful;
 }
 
 int main() {
@@ -225,11 +275,8 @@ int main() {
   string map_file_ = "../data/highway_map.csv";
   // The max s value before wrapping around the track back to 0
   double max_s = 6945.554;
-<<<<<<< HEAD
   int lane = 1;
   double ref_vel = 0.0;
-=======
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
 
   ifstream in_map_(map_file_.c_str(), ifstream::in);
 
@@ -253,11 +300,7 @@ int main() {
   	map_waypoints_dy.push_back(d_y);
   }
 
-<<<<<<< HEAD
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy, &ref_vel, &lane](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-=======
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,&map_waypoints_dx,&map_waypoints_dy](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -278,17 +321,13 @@ int main() {
           double car_d = j[1]["d"];
           double car_yaw = j[1]["yaw"];
           double car_speed = j[1]["speed"];
-<<<<<<< HEAD
-=======
 
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
           // Previous path data given to the Planner
           auto previous_path_x = j[1]["previous_path_x"];
           auto previous_path_y = j[1]["previous_path_y"];
           // Previous path's end s and d values 
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
-<<<<<<< HEAD
           // Sensor Fusion Data, a list of all other cars on the same side of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
           json msgJson;
@@ -317,6 +356,17 @@ int main() {
               check_car_s += (double)prev_size*0.02*check_car_speed;
               if(check_car_s > car_s && (check_car_s-car_s < 30)){
                 too_close = true;
+                // Should consider changing lanes
+                vector<double> vehicle_ahead1, vehicle_ahead2, vehicle_behind1, vehicle_behind2;
+                bool b_vehicle_ahead1, b_vehicle_ahead2, b_vehicle_behind1, b_vehicle_behind2;
+                b_vehicle_ahead1 = get_vehicle_ahead(car_s, lane-1, sensor_fusion, vehicle_ahead1);
+                b_vehicle_ahead2 = get_vehicle_ahead(car_s, lane+1, sensor_fusion, vehicle_ahead2);
+                b_vehicle_behind1 = get_vehicle_behind(car_s, lane-1, sensor_fusion, vehicle_behind1);
+                b_vehicle_behind2 = get_vehicle_behind(car_s, lane+1, sensor_fusion, vehicle_behind2);
+                
+                if(make_lane_change(b_vehicle_ahead1, b_vehicle_behind1, vehicle_ahead1, vehicle_behind1, "LEFT", lane, car_s, prev_size) == false){
+                  make_lane_change(b_vehicle_ahead2, b_vehicle_behind2, vehicle_ahead2, vehicle_behind2, "RIGHT", lane, car_s, prev_size);
+                }
               }
             }
           }
@@ -384,7 +434,7 @@ int main() {
           
           vector<double> next_x_vals;
           vector<double> next_y_vals;
-          double dist_inc = 0.4;
+          //double dist_inc = 0.4;
           double n_points = 50;
           
           // Use all previous points
@@ -419,27 +469,7 @@ int main() {
             
             next_x_vals.push_back(x_point);
             next_y_vals.push_back(y_point);
-=======
-
-          // Sensor Fusion Data, a list of all other cars on the same side of the road.
-          auto sensor_fusion = j[1]["sensor_fusion"];
-          json msgJson;
-
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
-          // TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
-          double dist_inc = 0.5;
-          double n_points = 50;
-          tk::spline spline;
-          for(int i = 0; i < n_points; i++)
-          {
-            double next_s = car_s + (i+1)*dist_inc;
-            double next_d = car_d;
-            vector<double> next_xy = getXY(next_s, next_d, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-            next_x_vals.push_back(next_xy[0]);
-            next_y_vals.push_back(next_xy[1]);
->>>>>>> 3bee86956fb07e7134307511dcf3d94f3f83d4c4
-          }
+	  }
           
           // END TODO
           msgJson["next_x"] = next_x_vals;
